@@ -60,6 +60,7 @@ type OS struct {
 	InotifyWatch            InotifyInfo
 	NetnsGetifaddrs         bool
 	VFS3Fscaps              bool
+	UeventInjection         bool
 
 	MockMode bool // If true some APIs will be mocked (for testing)
 }

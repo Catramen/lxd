@@ -120,6 +120,10 @@ func main() {
 	forkstartCmd := cmdForkstart{global: &globalCmd}
 	app.AddCommand(forkstartCmd.Command())
 
+	// forkuevent sub-command
+	forkueventCmd := cmdForkuevent{global: &globalCmd}
+	app.AddCommand(forkueventCmd.Command())
+
 	// import sub-command
 	importCmd := cmdImport{global: &globalCmd}
 	app.AddCommand(importCmd.Command())

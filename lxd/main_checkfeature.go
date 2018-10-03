@@ -22,7 +22,10 @@ import (
 #include "../shared/netns_getifaddrs.c"
 
 bool netnsid_aware = false;
+bool uevent_aware = false;
 char errbuf[4096];
+
+extern int can_inject_uevent(const char *uevent, size_t len);
 
 static int netns_set_nsid(int fd)
 {
@@ -63,6 +66,7 @@ static int netns_set_nsid(int fd)
 
 	return 0;
 }
+
 
 void is_netnsid_aware(int *hostnetns_fd, int *newnetns_fd)
 {
@@ -116,10 +120,19 @@ void is_netnsid_aware(int *hostnetns_fd, int *newnetns_fd)
 	netnsid_aware = true;
 }
 
+void is_uevent_aware()
+{
+	if (can_inject_uevent("dummy", 6) < 0)
+		return;
+
+	uevent_aware = true;
+}
+
 void checkfeature() {
 	int hostnetns_fd = -1, newnetns_fd = -1;
 
 	is_netnsid_aware(&hostnetns_fd, &newnetns_fd);
+	is_uevent_aware();
 
 	if (setns(hostnetns_fd, CLONE_NEWNET) < 0)
 		(void)sprintf(errbuf, "%s", "Failed to attach to host network namespace");
@@ -130,7 +143,7 @@ void checkfeature() {
 	if (newnetns_fd >= 0)
 		close(newnetns_fd);
 
-}
+    }
 
 static bool is_empty_string(char *s)
 {
@@ -146,4 +159,8 @@ func CanUseNetnsGetifaddrs() bool {
 	}
 
 	return bool(C.netnsid_aware)
+}
+
+func CanUseUeventInjection() bool {
+	return bool(C.uevent_aware)
 }
